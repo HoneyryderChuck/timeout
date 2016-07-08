@@ -50,7 +50,9 @@ end
 
 module Timeout
   def self.backend(handler)
-    return yield unless Thread.current.respond_to?(:timeout_handler)
+    unless Thread.current.respond_to?(:timeout_handler)
+      class << Thread.current ; attr_accessor :timeout_handler ; end
+    end
     default_handler = Thread.current.timeout_handler
     begin
       Thread.current.timeout_handler = handler
