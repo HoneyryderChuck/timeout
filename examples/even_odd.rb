@@ -14,13 +14,12 @@ end
 module IgnoreOddTimeout
   CustomTimeoutError = Class.new(RuntimeError)
   def self.call(sec, *)
-    if sec and sec.odd?
+    if sec && sec.odd?
       puts "#{sec} is odd, not timing out"
-      yield
     else
       puts "pretending to wait for #{sec} seconds..."
-      yield
     end
+    yield
   end
 end
 
