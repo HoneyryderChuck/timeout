@@ -1,20 +1,7 @@
 require "timeout/extensions"
 require "celluloid"
-module TimeoutExtensions
-  module Celluloid
-    def timeout_handler
-      Celluloid.method(:timeout).to_proc
-    end
-
-    def sleep_handler
-      Celluloid.method(:sleep).to_proc
-    end
-  end
-end
 
 module Celluloid
-  Actor.__send__(:include, TimeoutExctensions::Celluloid)
-
   ####################
   #
   # Celluloid Monkey-Patch Alert!!!!
@@ -53,4 +40,20 @@ module Celluloid
     end
     private :timeout
   end
+
+  # END OF MONKEY PATCHES! #
+
+  # This is how it works for celluloid: methods defined at the thread level. Each subsequent
+  # Timeout.timeout of sleep call will go through them.
+  module TimeoutExtensions
+    def timeout_handler
+      Celluloid.method(:timeout)
+    end
+
+    def sleep_handler
+      Celluloid.method(:sleep)
+    end
+  end
+
+  Thread.__send__(:include, TimeoutExtensions)
 end
