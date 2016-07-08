@@ -1,14 +1,19 @@
 require "timeout/extensions"
 require "celluloid"
-module Celluloid
-  # Reopening the thread class to define the time handlers and pointing them to celluloid respective methodsx
-  class Thread < ::Thread
-    def initialize(*)
-      self.timeout_handler = Celluloid.method(:timeout).to_proc
-      self.sleep_handler = Celluloid.method(:sleep).to_proc
-      super
+module TimeoutExtensions
+  module Celluloid
+    def timeout_handler
+      Celluloid.method(:timeout).to_proc
+    end
+
+    def sleep_handler
+      Celluloid.method(:sleep).to_proc
     end
   end
+end
+
+module Celluloid
+  Actor.__send__(:include, TimeoutExctensions::Celluloid)
 
   ####################
   #
@@ -18,6 +23,11 @@ module Celluloid
   #
   # These methods have kept the same functionality for quite some time, therefore are quite stable,
   # I just moved the locations and updated/corrected the method signatures.
+  #
+  # Why the monkey-patch? The Celluloid::Actor#timeout method from celluloid core doesn't respect
+  # the Timeout.timeout signature, that is, add the possibility of passing a custom exception. Also,
+  # a general timeout for the Celluloid scope should also be publicly acessibly, and (IMO) therefore defined
+  # as a module method.
   #
   ###################
 
