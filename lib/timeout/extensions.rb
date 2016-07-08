@@ -8,7 +8,6 @@ require "timeout"
 # or if your code breaks with the stdlib implementations.
 #
 
-
 module Timeout::Extensions
   module TimeoutMethods
     def timeout(*args, &block)
