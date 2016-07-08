@@ -15,8 +15,12 @@ RSpec.configure do |config|
   config.order = "random"
 end
 
+TimingThread = Class.new(Thread) do
+  attr_accessor :timeout_handler, :sleep_handler
+end
+
 def within_thread
-  Thread.new do
+  TimingThread.new do
     yield
   end.join
 end
